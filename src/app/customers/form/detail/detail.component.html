@@ -42,7 +42,7 @@
   </div>
   <div layout="row">
     <md-input-container layout-margin>
-      <input mdInput type="date" placeholder="{{'Day of birth' | translate}}" formControlName="dayOfBirth"/>
+      <input mdInput type="date" placeholder="{{'Day of birth' | translate}}" formControlName="dayOfBirth" [attr.min]="other" [attr.max]="today"/>
       <md-error *ngIf="form.get('dayOfBirth').hasError('required')" translate>
         Required
       </md-error>

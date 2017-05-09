@@ -43,7 +43,7 @@ export class CreateCustomerFormComponent implements OnInit, OnDestroy {
       countryCode: '',
       country: ''
     },
-    dateOfBirth: {},
+    dateOfBirth: undefined,
     contactDetails: [],
     customValues: []
   };

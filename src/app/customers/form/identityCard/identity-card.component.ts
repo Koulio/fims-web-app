@@ -16,8 +16,9 @@
 
 import {Component, Input} from '@angular/core';
 import {FormComponent} from '../../../../components/forms/form.component';
-import {Validators, FormBuilder} from '@angular/forms';
+import {FormBuilder, Validators} from '@angular/forms';
 import {IdentificationCard} from '../../../../services/customer/domain/identification-card.model';
+import {extractDate, formatDate} from '../helper/date-helper';
 import {ExpirationDate} from '../../../../services/customer/domain/expiration-date.model';
 
 @Component({
@@ -29,25 +30,18 @@ export class CustomerIdentityCardFormComponent extends FormComponent<Identificat
   @Input() set formData(identificationCard: IdentificationCard) {
     identificationCard = identificationCard || { type: 'id', number: '', expirationDate: undefined };
 
+    const expirationDate: ExpirationDate = identificationCard.expirationDate;
+
     this.form = this.formBuilder.group({
       type: [identificationCard.type, [Validators.required]],
       number: [identificationCard.number, Validators.required],
-      expirationDate: [this.formatDate(identificationCard.expirationDate), Validators.required],
+      expirationDate: [expirationDate ? formatDate(expirationDate.year, expirationDate.month, expirationDate.day) : '', Validators.required],
       issuer: [identificationCard.issuer, Validators.required]
     })
   };
 
   constructor(private formBuilder: FormBuilder) {
     super();
-  }
-
-  private formatDate(expirationDate: ExpirationDate): string{
-    if(!expirationDate) return '';
-    return `${expirationDate.year}-${this.addZero(expirationDate.month)}-${this.addZero(expirationDate.day)}`;
-  }
-
-  private addZero(value: number): string{
-    return ('0' + value).slice(-2);
   }
 
   /**
@@ -57,16 +51,16 @@ export class CustomerIdentityCardFormComponent extends FormComponent<Identificat
   get formData(): IdentificationCard{
     if(this.form.pristine) return undefined;
 
-    let expirationDate: string = this.form.get('expirationDate').value;
-    let chunks: string[] = expirationDate.split('-');
+    const expirationDate: string = this.form.get('expirationDate').value;
+    const date = extractDate(expirationDate);
 
     return {
       type: this.form.get('type').value,
       number: this.form.get('number').value,
       expirationDate: {
-        day: Number(chunks[2]),
-        month: Number(chunks[1]),
-        year: Number(chunks[0])
+        day: date.day,
+        month: date.month,
+        year: date.year
       },
       issuer: this.form.get('issuer').value
     }

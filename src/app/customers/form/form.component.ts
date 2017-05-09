@@ -39,9 +39,7 @@ export class CustomerFormComponent implements OnInit {
       firstName: customer.givenName,
       middleName: customer.middleName,
       lastName: customer.surname,
-      birthDay: customer.dateOfBirth.day,
-      birthMonth: customer.dateOfBirth.month,
-      birthYear: customer.dateOfBirth.year
+      dateOfBirth: customer.dateOfBirth
     };
 
     this.identityCardFormData = customer.identificationCard;
@@ -92,7 +90,7 @@ export class CustomerFormComponent implements OnInit {
     this.step.open();
   }
 
-  showIdentifierValidationError(): void{
+  showIdentifierValidationError(): void {
     this.detailForm.setError('identifier', 'unique', true);
     this.openDetailStep();
   }
@@ -117,14 +115,10 @@ export class CustomerFormComponent implements OnInit {
       givenName: detailFormData.firstName,
       surname: detailFormData.lastName,
       middleName: detailFormData.middleName,
+      dateOfBirth: detailFormData.dateOfBirth,
       type: 'PERSON',
       address: this.addressForm.formData,
       contactDetails: this.contactForm.formData,
-      dateOfBirth: {
-        day: detailFormData.birthDay,
-        month: detailFormData.birthMonth,
-        year: detailFormData.birthYear
-      },
       identificationCard: this.identityCardForm.formData,
       assignedOffice: this.selectedOffices && this.selectedOffices.length > 0 ? this.selectedOffices[0] : undefined,
       assignedEmployee: this.selectedEmployees && this.selectedEmployees.length > 0 ? this.selectedEmployees[0] : undefined,

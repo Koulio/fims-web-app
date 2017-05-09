@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-export interface DateOfBirth {
-  year: number;
-  month: number;
-  day: number;
+export function formatDate(year: number, month: number, day: number): string {
+  return `${year}-${addZero(month)}-${addZero(day)}`;
+}
+
+export function extractDate(dateString: string) : { day: number, month: number, year: number } {
+  const chunks: string[] = dateString.split('-');
+
+  return {
+    day: Number(chunks[2]),
+    month: Number(chunks[1]),
+    year: Number(chunks[0])
+  }
+}
+
+function addZero(value: number): string {
+  return ('0' + value).slice(-2);
 }

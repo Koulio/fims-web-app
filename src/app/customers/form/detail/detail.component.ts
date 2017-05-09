@@ -18,15 +18,16 @@ import {Component, Input} from '@angular/core';
 import {FormComponent} from '../../../../components/forms/form.component';
 import {Validators, FormBuilder} from '@angular/forms';
 import {FimsValidators} from '../../../../components/validator/validators';
+import {DateOfBirth} from '../../../../services/customer/domain/date-of-birth.model';
+import {extractDate, formatDate} from '../helper/date-helper';
+import {todayAsISOString} from '../../../../services/domain/date.converter';
 
 export interface CustomerDetailFormData{
   identifier: string;
   firstName: string;
   middleName: string;
   lastName: string;
-  birthDay?: number;
-  birthMonth?: number;
-  birthYear?: number;
+  dateOfBirth: DateOfBirth;
 }
 
 @Component({
@@ -35,43 +36,43 @@ export interface CustomerDetailFormData{
 })
 export class CustomerDetailFormComponent extends FormComponent<CustomerDetailFormData> {
 
-  @Input() set formData(formData: CustomerDetailFormData){
+  other: string = "2016-02-01";
+
+  today: string = todayAsISOString();
+
+  @Input() set formData(formData: CustomerDetailFormData) {
+    const dateOfBirth: DateOfBirth = formData.dateOfBirth;
+
     this.form = this.formBuilder.group({
       identifier: [formData.identifier, [Validators.required, Validators.minLength(3), Validators.maxLength(32), FimsValidators.urlSafe()]],
       firstName: [formData.firstName, Validators.required],
       middleName: [formData.middleName],
       lastName: [formData.lastName, Validators.required],
-      dayOfBirth: [this.formatDate(formData.birthYear, formData.birthMonth, formData.birthDay), Validators.required],
+      dayOfBirth: [dateOfBirth ? formatDate(dateOfBirth.year, dateOfBirth.month, dateOfBirth.day) : '', Validators.required],
     })
   };
 
   @Input() editMode: boolean;
-
-  private formatDate(year: number, month: number, day: number): string{
-    return `${year}-${this.addZero(month)}-${this.addZero(day)}`;
-  }
-
-  private addZero(value: number): string{
-    return ('0' + value).slice(-2);
-  }
 
   constructor(private formBuilder: FormBuilder) {
     super();
   }
 
   get formData(): CustomerDetailFormData{
-    let birthDate: string = this.form.get('dayOfBirth').value;
+    const birthDateAsString: string = this.form.get('dayOfBirth').value;
 
-    let chunks: string[] = birthDate ? birthDate.split('-') : [];
+    const date = extractDate(birthDateAsString);
 
     return {
       identifier: this.form.get('identifier').value,
       firstName: this.form.get('firstName').value,
       middleName: this.form.get('middleName').value,
       lastName: this.form.get('lastName').value,
-      birthYear: chunks.length ? Number(chunks[0]) : undefined,
-      birthMonth: chunks.length ? Number(chunks[1]) : undefined,
-      birthDay: chunks.length ? Number(chunks[2]) : undefined,
+      dateOfBirth: {
+        year: date.year,
+        month: date.month,
+        day: date.day,
+      }
     }
   }
 
